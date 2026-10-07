@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useThanal } from './ThanalContext';
 import { X, CheckCircle, AlertCircle, Sprout, Calendar } from 'lucide-react';
 import { calculateThanalWindow } from './thanalWindow';
@@ -23,6 +23,13 @@ export const VolunteerRegistrationModal: React.FC<VolunteerRegistrationModalProp
   const [unitId, setUnitId] = useState(units[0]?.id || 'GCEK-141');
   const [batch, setBatch] = useState('');
   const [password, setPassword] = useState('password123');
+  const [pwLocked, setPwLocked] = useState(true);
+  useEffect(() => {
+    if (isOpen) {
+      setPwLocked(true);
+      setPassword('');
+    }
+  }, [isOpen]);
 
   const [statusMessage, setStatusMessage] = useState<{
     type: 'success' | 'error';
@@ -244,8 +251,12 @@ export const VolunteerRegistrationModal: React.FC<VolunteerRegistrationModalProp
                 </label>
                 <input
                   type="password"
+                  name="thanal-create-password"
                   autoComplete="new-password"
+                  readOnly={pwLocked}
+                  onFocus={() => setPwLocked(false)}
                   required
+                  minLength={6}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Create password"
