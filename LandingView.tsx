@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { supabase } from './supabase';
 import { useThanal } from './ThanalContext';
 import { calculateThanalWindow } from './thanalWindow';
 import campusImg from './campus.jpg';
@@ -14,7 +15,22 @@ export const LandingView: React.FC<LandingViewProps> = ({
   onOpenLogin,
   onOpenVolRegister,
 }) => {
-  const { units, volunteers, submissions } = useThanal();
+  const { units } = useThanal();
+  const [stats, setStats] = useState<{
+    volunteers: number;
+    trees: number;
+    units: { code: string; volunteers: number; trees: number }[];
+  } | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    supabase.rpc('public_stats').then(({ data, error }) => {
+      if (!cancelled && !error && data) setStats(data as any);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
   const [testDob, setTestDob] = useState('2004-10-20');
   const previewWindow = calculateThanalWindow(testDob, 2026);
 
@@ -84,8 +100,8 @@ export const LandingView: React.FC<LandingViewProps> = ({
         <div className="grid grid-cols-3 bg-white rounded-2xl shadow-lg border border-stone-200 divide-x divide-stone-200">
           {[
             { n: units.length, l: 'NSS Units' },
-            { n: volunteers.length, l: 'Volunteers' },
-            { n: submissions.length, l: 'Trees Planted' },
+            { n: stats ? stats.volunteers : '–', l: 'Volunteers' },
+            { n: stats ? stats.trees : '–', l: 'Trees Planted' },
           ].map((x) => (
             <div key={x.l} className="py-5 text-center">
               <div className="text-2xl sm:text-3xl font-extrabold text-green-800">{x.n}</div>
@@ -196,8 +212,9 @@ export const LandingView: React.FC<LandingViewProps> = ({
         <h2 className="text-2xl font-bold text-stone-900 text-center">NSS Units</h2>
         <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {units.map((u) => {
-            const uVols = volunteers.filter((v) => v.unitId === u.id);
-            const uSubs = submissions.filter((s) => s.unitId === u.id);
+            const uStat = stats?.units.find((x) => String(x.code) === String(u.code));
+            const uVols = { length: uStat ? uStat.volunteers : 0 };
+            const uSubs = { length: uStat ? uStat.trees : 0 };
             return (
               <div key={u.id} className="bg-white border border-stone-200 rounded-2xl p-5 shadow-sm">
                 <div className="flex items-center justify-between">
