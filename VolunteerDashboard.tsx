@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useThanal, displayId } from './ThanalContext';
+import ProfilePhoto from './ProfilePhoto';
 import { VolunteerUser, TagApprovalStatus } from './types';
 import {
   calculateThanalWindow,
@@ -214,6 +215,8 @@ export const VolunteerDashboard: React.FC<VolunteerDashboardProps> = ({ activeSe
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-8">
       {/* Top Identity Header */}
       <div className="bg-white border border-stone-200 rounded-2xl p-6 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-5">
+        <ProfilePhoto size={84} />
         <div>
           <div className="text-xs text-stone-500 font-medium">
             National Service Scheme · {userUnit?.name || volunteer.unitCode}
@@ -230,6 +233,7 @@ export const VolunteerDashboard: React.FC<VolunteerDashboardProps> = ({ activeSe
             <span aria-hidden="true">·</span>
             <span>College: {volunteer.college}</span>
           </div>
+        </div>
         </div>
 
         {/* Current Status Pill-Free Block */}
