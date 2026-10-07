@@ -8,13 +8,11 @@ import { Sprout, Users, ArrowRight, Leaf, CalendarDays, Camera, BadgeCheck } fro
 interface LandingViewProps {
   onOpenLogin: () => void;
   onOpenVolRegister: () => void;
-  onOpenVsRegister: () => void;
 }
 
 export const LandingView: React.FC<LandingViewProps> = ({
   onOpenLogin,
   onOpenVolRegister,
-  onOpenVsRegister,
 }) => {
   const { units, volunteers, submissions } = useThanal();
   const [testDob, setTestDob] = useState('2004-10-20');
@@ -64,12 +62,6 @@ export const LandingView: React.FC<LandingViewProps> = ({
                 className="px-6 py-3 bg-white/10 hover:bg-white/20 border border-white/30 text-white rounded-full text-sm font-semibold transition-colors"
               >
                 Sign In
-              </button>
-              <button
-                onClick={onOpenVsRegister}
-                className="px-3 py-3 text-green-200 hover:text-white text-sm font-medium underline-offset-4 hover:underline"
-              >
-                Register as VS
               </button>
             </div>
           </div>
@@ -178,10 +170,10 @@ export const LandingView: React.FC<LandingViewProps> = ({
             </div>
             <h3 className="text-lg font-bold text-stone-900">Volunteer Secretary (VS)</h3>
             <p className="text-sm text-stone-600 leading-relaxed">
-              Leads a unit. Approves volunteer registrations, reviews planting photos and verifies tree tags.
+              Leads a unit. Approves volunteer registrations, reviews planting photos and verifies tree tags. Each unit has its own VS login.
             </p>
-            <button onClick={onOpenVsRegister} className="text-sm font-semibold text-green-800 hover:text-green-600 flex items-center gap-1">
-              Register as VS <ArrowRight className="w-4 h-4" />
+            <button onClick={onOpenLogin} className="text-sm font-semibold text-green-800 hover:text-green-600 flex items-center gap-1">
+              VS Sign In <ArrowRight className="w-4 h-4" />
             </button>
           </div>
           <div className="bg-white border border-stone-200 rounded-2xl p-6 shadow-sm space-y-3">

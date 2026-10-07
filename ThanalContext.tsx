@@ -33,7 +33,6 @@ interface ThanalContextType {
   // Auth & Registration
   login: (id: string, password?: string) => Promise<{ success: boolean; message: string; user?: AnyUser }>;
   logout: () => void;
-  registerVs: (data: Omit<VSUser, 'role' | 'status' | 'createdAt'>) => Promise<{ success: boolean; message: string }>;
   registerVolunteer: (data: Omit<VolunteerUser, 'role' | 'status' | 'createdAt'> & { batch?: string }) => Promise<{ success: boolean; message: string }>;
 
   // VS Actions
@@ -361,11 +360,6 @@ export const ThanalProvider: React.FC<{ children: ReactNode }> = ({ children }) 
         return { success: false, message: msg };
       }
       if (user.role === 'VS') {
-        const { data: vsOk } = await supabase.rpc('is_vs_email_allowed', { p_email: user.email });
-        if (!vsOk) {
-          await supabase.auth.signOut();
-          return { success: false, message: 'This email is not authorised as a VS.' };
-        }
         setVsUsers((prev) => [...prev.filter((v) => v.email.toLowerCase() !== user.email.toLowerCase()), user]);
       } else {
         setVolunteers((prev) => [...prev.filter((v) => v.email.toLowerCase() !== user.email.toLowerCase()), user as VolunteerUser]);
@@ -429,107 +423,6 @@ export const ThanalProvider: React.FC<{ children: ReactNode }> = ({ children }) 
     supabase.auth.signOut();
     setDriveSettings(null);
     setCurrentUser(null);
-  };
-
-  // VS Registration
-  const registerVs = async (data: Omit<VSUser, 'role' | 'status' | 'createdAt'>) => {
-    const existing = vsUsers.find(
-      (v) => v.id.toLowerCase() === data.id.toLowerCase() || v.email.toLowerCase() === data.email.toLowerCase()
-    );
-    if (existing) {
-      return { success: false, message: 'A VS with this ID or Email is already registered.' };
-    }
-
-    // Only the single email whitelisted in the database may register as a VS
-    // (is_vs_email_allowed is the source of truth; it is also enforced in the database).
-    const { data: vsAllowed, error: vsAllowedError } = await supabase.rpc('is_vs_email_allowed', {
-      p_email: data.email.trim(),
-    });
-    if (vsAllowedError) {
-      return { success: false, message: `Could not verify VS email: ${vsAllowedError.message}` };
-    }
-    if (!vsAllowed) {
-      return {
-        success: false,
-        message: 'This email is not authorised for VS registration.',
-      };
-    }
-
-    try {
-      const { data: unitRow, error: unitError } = await supabase
-        .from('units')
-        .select('id, unit_number')
-        .eq('unit_number', data.unitCode)
-        .maybeSingle();
-
-      if (unitError) {
-        console.error('Supabase unit lookup failed:', unitError);
-        return { success: false, message: `Could not load the selected NSS unit: ${unitError.message}` };
-      }
-      if (!unitRow) {
-        return {
-          success: false,
-          message: `NSS Unit ${data.unitCode} is not configured in Supabase yet. Add it to public.units first.`,
-        };
-      }
-
-      const { data: authData, error: authError } = await supabase.auth.signUp({
-        email: data.email.trim(),
-        password: data.password || '',
-        options: {
-          data: {
-            name: data.name.trim(),
-            role: 'VS',
-            unit_id: unitRow.id,
-            unit_number: data.unitCode,
-            date_of_birth: data.dob,
-          },
-        },
-      });
-
-      if (authError) {
-        console.error('Supabase Auth signup failed:', authError);
-        return { success: false, message: `Registration failed: ${authError.message}` };
-      }
-      if (!authData.user) {
-        return { success: false, message: 'Registration failed: Supabase did not return a user account.' };
-      }
-
-      const { error: profileError } = await supabase.from('users').insert({
-        user_id: authData.user.id,
-        name: data.name.trim(),
-        email: data.email.trim(),
-        role: 'VS',
-        unit_id: unitRow.id,
-        date_of_birth: data.dob || null,
-        account_status: 'APPROVED',
-      });
-
-      if (profileError) {
-        console.error('Supabase users insert failed:', profileError);
-        return {
-          success: false,
-          message: `Auth account was created, but the THANAL profile could not be saved: ${profileError.message}`,
-        };
-      }
-
-      const newVs: VSUser = {
-        ...data,
-        role: 'VS',
-        status: 'APPROVED',
-        approvedAt: systemDate,
-        createdAt: systemDate,
-      };
-      setVsUsers((prev) => [...prev.filter((v) => v.email.toLowerCase() !== data.email.toLowerCase()), newVs]);
-
-      return {
-        success: true,
-        message: 'VS registration successful! You can now log in with your credentials.',
-      };
-    } catch (error) {
-      console.error('Unexpected VS registration error:', error);
-      return { success: false, message: 'Registration failed unexpectedly. Please try again.' };
-    }
   };
 
   // Volunteer Registration
@@ -887,7 +780,6 @@ export const ThanalProvider: React.FC<{ children: ReactNode }> = ({ children }) 
       resetSystemDate,
       login,
       logout,
-      registerVs,
       registerVolunteer,
       approveVolunteer,
       rejectVolunteer,

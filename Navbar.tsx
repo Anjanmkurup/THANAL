@@ -7,7 +7,6 @@ interface NavbarProps {
   currentTab: string;
   onSelectTab: (tab: string) => void;
   onOpenLogin: () => void;
-  onOpenVsRegister: () => void;
   onOpenVolRegister: () => void;
   onOpenNotifications: () => void;
 }
@@ -16,7 +15,6 @@ export const Navbar: React.FC<NavbarProps> = ({
   currentTab,
   onSelectTab,
   onOpenLogin,
-  onOpenVsRegister,
   onOpenVolRegister,
   onOpenNotifications,
 }) => {

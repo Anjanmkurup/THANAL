@@ -3,7 +3,6 @@ import { ThanalProvider, useThanal, displayId } from './ThanalContext';
 import { Navbar } from './Navbar';
 import { NotificationDrawer } from './NotificationDrawer';
 import { LoginModal } from './LoginModal';
-import { VsRegistrationModal } from './VsRegistrationModal';
 import { VolunteerRegistrationModal } from './VolunteerRegistrationModal';
 import { VolunteerDashboard } from './VolunteerDashboard';
 import { VsDashboard } from './VsDashboard';
@@ -15,7 +14,6 @@ const ThanalAppContent: React.FC = () => {
 
   const [activeTab, setActiveTab] = useState<string>('home');
   const [isLoginOpen, setIsLoginOpen] = useState(false);
-  const [isVsRegisterOpen, setIsVsRegisterOpen] = useState(false);
   const [isVolRegisterOpen, setIsVolRegisterOpen] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
 
@@ -89,7 +87,6 @@ const ThanalAppContent: React.FC = () => {
       <LandingView
         onOpenLogin={() => setIsLoginOpen(true)}
         onOpenVolRegister={() => setIsVolRegisterOpen(true)}
-        onOpenVsRegister={() => setIsVsRegisterOpen(true)}
       />
     );
   };
@@ -101,7 +98,6 @@ const ThanalAppContent: React.FC = () => {
         currentTab={activeTab}
         onSelectTab={setActiveTab}
         onOpenLogin={() => setIsLoginOpen(true)}
-        onOpenVsRegister={() => setIsVsRegisterOpen(true)}
         onOpenVolRegister={() => setIsVolRegisterOpen(true)}
         onOpenNotifications={() => setIsNotificationsOpen(true)}
       />
@@ -125,14 +121,7 @@ const ThanalAppContent: React.FC = () => {
       <LoginModal
         isOpen={isLoginOpen}
         onClose={() => setIsLoginOpen(false)}
-        onOpenVsRegister={() => setIsVsRegisterOpen(true)}
         onOpenVolRegister={() => setIsVolRegisterOpen(true)}
-      />
-
-      <VsRegistrationModal
-        isOpen={isVsRegisterOpen}
-        onClose={() => setIsVsRegisterOpen(false)}
-        onOpenLogin={() => setIsLoginOpen(true)}
       />
 
       <VolunteerRegistrationModal

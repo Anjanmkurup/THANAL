@@ -5,14 +5,12 @@ import { LogIn, X, Shield, Users, User, AlertCircle, ArrowRight } from 'lucide-r
 interface LoginModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onOpenVsRegister: () => void;
   onOpenVolRegister: () => void;
 }
 
 export const LoginModal: React.FC<LoginModalProps> = ({
   isOpen,
   onClose,
-  onOpenVsRegister,
   onOpenVolRegister,
 }) => {
   const { login } = useThanal();
@@ -101,7 +99,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
           </button>
 
           <div className="pt-3 border-t border-stone-100 flex flex-col sm:flex-row items-center justify-between text-xs text-stone-500 gap-2">
-            <span>New user?</span>
+            <span>New volunteer? VS accounts are issued per unit.</span>
             <div className="flex items-center gap-3">
               <button
                 type="button"
@@ -112,17 +110,6 @@ export const LoginModal: React.FC<LoginModalProps> = ({
                 className="text-green-800 hover:text-green-950 font-medium"
               >
                 Volunteer Registration
-              </button>
-              <span aria-hidden="true">·</span>
-              <button
-                type="button"
-                onClick={() => {
-                  onClose();
-                  onOpenVsRegister();
-                }}
-                className="text-green-800 hover:text-green-950 font-medium"
-              >
-                VS Registration
               </button>
             </div>
           </div>
