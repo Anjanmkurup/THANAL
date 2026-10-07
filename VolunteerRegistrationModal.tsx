@@ -156,7 +156,7 @@ export const VolunteerRegistrationModal: React.FC<VolunteerRegistrationModalProp
                   required
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="e.g. Ananya Sreedhar"
+                  placeholder="Your full name"
                   className="w-full px-3 py-2 text-xs border border-stone-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-700"
                 />
               </div>
